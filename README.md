@@ -43,6 +43,10 @@ README.md           this file
   same mechanisms; licensing via Multitenant Hosting Rights.
 - [Windows 11 images in the Marketplace](docs/research/windows-11-images.md) — versions, builds,
   and editions available, with image retention.
+- [Custom Windows 11 images](docs/research/custom-images.md) — Compute Gallery path for builds not
+  in the Marketplace (not tested yet).
+- [Test VM lifecycle in a pipeline](docs/research/pipeline-lifecycle.md) — guaranteed cleanup and
+  Azure DevOps connection options (design notes).
 
 ## Deploy & use
 
