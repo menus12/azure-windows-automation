@@ -8,7 +8,8 @@ PowerShell defaults keeps going after errors, exits 0, and `apply` reports succe
 failure, the failed extension or run command **stays in Azure but not in Terraform state**, so a
 plain second `apply` fails with "already exists - needs to be imported".
 
-The Custom Script Extension and Managed Run Command behave the same way in every case below.
+The Custom Script Extension and Managed Run Command behave the same way in every case below, on
+both Windows Server 2022 and Windows 11.
 
 ## Experiment
 
@@ -39,6 +40,19 @@ Terraform configuration and scripts: [experiments/script-failure](../../experime
 |------|--------|
 | `cse-throw` | **Error**: `a resource with the ID ".../extensions/run-customdata" already exists - to be managed via Terraform this resource needs to be imported into the State`. The failed extension is in Azure, not in state |
 | `rc-throw` | Run command created and failed: `exitCode 1`, `apply` **error** with the script's error stream. The run command stays in Azure as `Failed`, not in state — the same situation as `cse-throw` |
+
+## Windows 11
+
+Repeated with [`win11.tfvars`](../../experiments/script-failure/win11.tfvars) (Windows 11
+Enterprise 25H2, Trusted Launch). Same results, and this time `rc-throw` ran cleanly on the first
+apply:
+
+| Case | First apply | Second apply |
+|------|-------------|--------------|
+| `cse-throw` | **Error**, exit code 1 with the script's stderr | **Error**: extension already exists, needs import |
+| `cse-soft` | **Success** (`msiexec` 1619 hidden in substatus) | No change |
+| `rc-throw` | **Error**, `exitCode 1` with the script's error stream | **Error**: run command already exists, needs import |
+| `rc-soft` | **Success** (`msiexec` 1619 hidden in `instance_view.error`) | No change |
 
 ## Conclusions
 

@@ -31,8 +31,19 @@ through the VM Agent instead:
 - **Managed Run Command** (`azurerm_virtual_machine_run_command`) — inline scripts, several per
   VM, output in the resource's `instance_view`.
 
-Which one is the default is an open decision. Either way, scripts run as `LocalSystem`, must be
-idempotent, must not restart the VM, and use `Invoke-WebRequest -UseBasicParsing`.
+Both behave the same on Windows Server 2022 and Windows 11. Which one is the default is an open
+decision. Either way, scripts run as `LocalSystem`, must be idempotent, must not restart the VM,
+and use `Invoke-WebRequest -UseBasicParsing`.
+
+Scripts must fail loudly ([research](research/script-failure.md)): `$ErrorActionPreference =
+"Stop"`, an exit code check after every native command, and a non-zero exit on failure. Azure and
+Terraform only see the exit code. A failed extension or run command stays in Azure outside the
+Terraform state and has to be deleted (or the VM recreated) before a retry.
+
+## Windows 11
+
+Test VMs run Windows 11 Enterprise from the Marketplace ([research](research/windows-client.md)):
+`license_type = "Windows_Client"` and Trusted Launch (`secure_boot_enabled`, `vtpm_enabled`).
 
 ## Naming
 

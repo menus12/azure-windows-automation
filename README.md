@@ -39,6 +39,8 @@ README.md           this file
   does not exist for Windows in Azure; the Custom Script Extension and Managed Run Command work.
 - [Deploy-time script failures](docs/research/script-failure.md) — `terraform apply` fails only on a
   non-zero exit; a failed extension or run command blocks a plain retry.
+- [Windows 11 VMs in Azure](docs/research/windows-client.md) — Marketplace images work with the
+  same mechanisms; licensing via Multitenant Hosting Rights.
 
 ## Deploy & use
 

@@ -66,6 +66,31 @@ Most of the extension's time is the VM Agent installing the extension handler, n
   `terraform apply` means the configuration has run.
 - Outbound downloads worked through a Standard public IP with no inbound rules.
 
+## Windows 11
+
+The same configuration was run with [`win11.tfvars`](../../experiments/windows-provisioning/win11.tfvars):
+Windows 11 Enterprise 25H2 (`MicrosoftWindowsDesktop:windows-11:win11-25h2-ent`, build 26200),
+`license_type = "Windows_Client"`, Trusted Launch (Secure Boot + vTPM).
+
+| Test | Result on Windows 11 |
+|------|----------------------|
+| A `custom_data` | Same as Server: `CustomData.bin` present, plain text, **not executed** |
+| B `user_data` | Same as Server: available from IMDS, **not executed** |
+| C Custom Script Extension | **Succeeded**: 7-Zip 26.05 installed, as `NT AUTHORITY\SYSTEM` |
+| D Managed Run Command | **Succeeded**: PowerShell 7.6.9 installed |
+
+| Step | Windows Server 2022 | Windows 11 |
+|------|---------------------|------------|
+| VM resource | 1 min 41 s | 3 min 15 s |
+| Custom Script Extension resource | 2 min 46 s | 4 min 45 s |
+| Managed Run Command resource | 56 s | 1 min 10 s |
+| Whole `terraform apply` | ~6.5 min | ~9 min |
+
+The VM reported `securityType = TrustedLaunch`; inside, `Confirm-SecureBootUEFI` and
+`(Get-Tpm).TpmPresent` both returned `True`. Windows was activated against Azure KMS
+(`azkms.core.windows.net`, `VOLUME_KMSCLIENT` channel). Activation does not prove the licensing
+entitlement; see [windows-client.md](windows-client.md).
+
 ## Open questions
 
 - Does `terraform apply` fail when the script fails (non-zero exit / thrown error)? Needed for CI.
