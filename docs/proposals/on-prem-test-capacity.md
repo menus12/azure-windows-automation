@@ -69,6 +69,57 @@ by a self-hosted agent on the host — creates a Hyper-V VM from the golden VHDX
 disk, so creation takes seconds and the base image stays untouched), runs the tests, and deletes
 the VM.
 
+**Architecture:**
+
+```mermaid
+flowchart LR
+    subgraph AZ["Azure"]
+        ARC["Arc-enabled servers<br/>RBAC, Run Command, Update Manager,<br/>Policy, Monitor"]
+    end
+    subgraph OP["On-prem"]
+        ADO["Azure DevOps Server"]
+        IMG[("Image share<br/>golden Windows 11 VHDX")]
+        subgraph HOST1["Hyper-V host 1"]
+            AG1["Connected Machine agent"]
+            VM1["Ephemeral test VM"]
+        end
+        subgraph HOSTN["Hyper-V host N"]
+            AGN["Connected Machine agent"]
+            VMN["Ephemeral test VM"]
+        end
+    end
+    AG1 -- "outbound HTTPS" --> ARC
+    AGN -- "outbound HTTPS" --> ARC
+    IMG -- "differencing disk" --> VM1
+    IMG -- "differencing disk" --> VMN
+    ADO -- "test job" --> VM1
+    ADO -- "test job" --> VMN
+```
+
+Each host runs Windows Server with Hyper-V and is managed from Azure. The test VMs on it are not
+Azure resources: a script on the host creates and deletes them.
+
+**One test run:**
+
+```mermaid
+sequenceDiagram
+    participant P as Pipeline (Azure DevOps Server)
+    participant A as Azure (Arc Run Command)
+    participant H as Hyper-V host
+    participant V as Test VM
+    P->>A: Run "create test VM" on host
+    A->>H: Execute script via Connected Machine agent
+    H->>V: New-VM from golden VHDX (differencing disk), start
+    H->>V: Configure and run tests (PowerShell Direct or agent)
+    V-->>P: Test results
+    P->>A: Run "delete test VM" on host (always)
+    A->>H: Execute script
+    H->>V: Stop and remove VM and differencing disk
+```
+
+The pipeline can also call the host directly through a self-hosted agent on the host; Azure then
+only manages the host.
+
 **Limitations to be aware of:**
 
 - Arc-enabled servers manage **the host**, not the VMs on it. Test VMs are not Azure resources;
@@ -92,6 +143,55 @@ horizon 2.
 virtualization platform on own hardware, managed from Azure. Through Arc resource bridge and a
 custom location it appears in Azure like a private region: VMs, disks, networks, and images are
 Azure resources, created through the Azure portal, CLI, ARM/Bicep, or Terraform.
+
+**Architecture:**
+
+```mermaid
+flowchart LR
+    subgraph AZ["Azure"]
+        ARM["Azure Resource Manager"]
+        CL["Custom location"]
+        RES["Azure Local VM resources<br/>VMs, NICs, disks, images"]
+        ARM --> CL
+        ARM --- RES
+    end
+    subgraph OP["On-prem"]
+        ADO["Azure DevOps Server<br/>pipeline agent with Terraform"]
+        subgraph AL["Azure Local instance (validated servers)"]
+            ARB["Arc resource bridge<br/>appliance VM"]
+            IMG[("VM images<br/>golden Windows 11 VHDX")]
+            VMS["Ephemeral test VMs"]
+        end
+    end
+    ADO -- "terraform apply / destroy" --> ARM
+    ARB -- "outbound HTTPS" --> CL
+    ARB -- "create / delete" --> VMS
+    IMG --> VMS
+    ADO -- "test job" --> VMS
+```
+
+The test VMs are Azure resources in the custom location, like VMs in an Azure region, but run on
+own hardware.
+
+**One test run:**
+
+```mermaid
+sequenceDiagram
+    participant P as Pipeline (Azure DevOps Server)
+    participant R as Azure Resource Manager
+    participant B as Arc resource bridge
+    participant V as Test VM
+    P->>R: terraform apply (VM in custom location)
+    R->>B: Create VM request
+    B->>V: Create VM from image, start
+    P->>V: Configure and run tests (extension or agent)
+    V-->>P: Test results
+    P->>R: terraform destroy (always)
+    R->>B: Delete VM request
+    B->>V: Remove VM and disks
+```
+
+This is the same flow as horizon 0 in Azure; only the location and the Terraform resources differ.
 
 **What it brings:**
 
