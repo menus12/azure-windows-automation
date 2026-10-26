@@ -24,7 +24,8 @@ Windows 11 Enterprise multi-session for Azure Virtual Desktop and are not used.
 
 `az vm image list-skus -l westeurope -p MicrosoftWindowsDesktop -f windows-11` on 2026-10-26
 listed, among others: `win11-23h2-ent`, `win11-24h2-ent`/`-pro`, `win11-25h2-ent`/`-pro`,
-`win11-26h2-ent`/`-pro`. The experiments use `win11-25h2-ent`.
+`win11-26h2-ent`/`-pro`. The experiments use `win11-25h2-ent`. Full list of versions, builds,
+and editions: [windows-11-images.md](windows-11-images.md).
 
 ## Technical requirements
 

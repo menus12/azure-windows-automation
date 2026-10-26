@@ -41,6 +41,8 @@ README.md           this file
   non-zero exit; a failed extension or run command blocks a plain retry.
 - [Windows 11 VMs in Azure](docs/research/windows-client.md) — Marketplace images work with the
   same mechanisms; licensing via Multitenant Hosting Rights.
+- [Windows 11 images in the Marketplace](docs/research/windows-11-images.md) — versions, builds,
+  and editions available, with image retention.
 
 ## Deploy & use
 
