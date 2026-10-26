@@ -86,6 +86,9 @@ resource "azurerm_windows_virtual_machine" "this" {
   admin_username        = "azureadmin"
   admin_password        = random_password.admin.result
   network_interface_ids = [azurerm_network_interface.this.id]
+  license_type          = var.license_type
+  secure_boot_enabled   = var.trusted_launch
+  vtpm_enabled          = var.trusted_launch
   tags                  = local.tags
 
   # Test A: custom data. Expected to land in C:\AzureData\CustomData.bin
@@ -101,9 +104,9 @@ resource "azurerm_windows_virtual_machine" "this" {
   }
 
   source_image_reference {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2022-datacenter-smalldisk-g2"
+    publisher = var.image.publisher
+    offer     = var.image.offer
+    sku       = var.image.sku
     version   = "latest"
   }
 

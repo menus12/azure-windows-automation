@@ -101,6 +101,9 @@ resource "azurerm_windows_virtual_machine" "this" {
   admin_username        = "azureadmin"
   admin_password        = random_password.admin.result
   network_interface_ids = [azurerm_network_interface.this[each.key].id]
+  license_type          = var.license_type
+  secure_boot_enabled   = var.trusted_launch
+  vtpm_enabled          = var.trusted_launch
   tags                  = local.tags
 
   # Custom Script Extension cases carry their payload as custom data.
@@ -112,9 +115,9 @@ resource "azurerm_windows_virtual_machine" "this" {
   }
 
   source_image_reference {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2022-datacenter-smalldisk-g2"
+    publisher = var.image.publisher
+    offer     = var.image.offer
+    sku       = var.image.sku
     version   = "latest"
   }
 

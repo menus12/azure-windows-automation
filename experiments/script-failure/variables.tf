@@ -20,3 +20,29 @@ variable "vm_size" {
   type        = string
   default     = "Standard_B2s"
 }
+
+variable "image" {
+  description = "Marketplace image reference."
+  type = object({
+    publisher = string
+    offer     = string
+    sku       = string
+  })
+  default = {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2022-datacenter-smalldisk-g2"
+  }
+}
+
+variable "license_type" {
+  description = "Licensing benefit: Windows_Client for Windows 10/11 images, null for Windows Server pay-as-you-go."
+  type        = string
+  default     = null
+}
+
+variable "trusted_launch" {
+  description = "Enable Secure Boot and vTPM (Trusted Launch). Expected by Windows 11."
+  type        = bool
+  default     = false
+}
