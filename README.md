@@ -27,6 +27,7 @@ Full technical reference: [docs/conventions.md](docs/conventions.md).
 ```
 docs/
   conventions.md    technical reference: architecture, conventions, open decisions
+  proposals/        proposals for decisions outside this repository
   research/         findings from experiments and documentation reviews
 experiments/        self-contained Terraform experiments (one directory each)
 CONTRIBUTING.md     how to work in this repository
@@ -47,6 +48,12 @@ README.md           this file
   in the Marketplace (not tested yet).
 - [Test VM lifecycle in a pipeline](docs/research/pipeline-lifecycle.md) — guaranteed cleanup and
   Azure DevOps connection options (design notes).
+
+## Proposals
+
+- [On-prem test agent capacity with Azure Arc and Azure Local](docs/proposals/on-prem-test-capacity.md)
+  — Hyper-V + Arc-enabled servers instead of a Proxmox cluster; Azure Local as the vSphere
+  replacement (draft).
 
 ## Deploy & use
 
