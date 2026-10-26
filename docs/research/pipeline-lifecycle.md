@@ -31,13 +31,16 @@ error. One `destroy` step is not enough. Layers:
 
 ## Connecting the VM to Azure DevOps
 
+The existing test agents run against **Azure DevOps Server** (on-prem), not Azure DevOps Services.
+Some agent features below exist only in Services; this is noted per option.
+
 Three options, to be compared and tested:
 
 | Option | How | Pros | Cons |
 |--------|-----|------|------|
-| **A. Ephemeral self-hosted agent on the test VM** | Provisioning installs the Azure Pipelines agent and registers it in a pool; the next job runs on the VM; the agent is removed before `destroy` | Native tasks for artifacts and test results. Registration with a service principal (agent 3.227.1+), no PAT | Agent registration and cleanup to manage |
+| **A. Ephemeral self-hosted agent on the test VM** | Provisioning installs the Azure Pipelines agent and registers it in a pool; the next job runs on the VM; the agent is removed before `destroy` | Native tasks for artifacts and test results | Agent registration and cleanup to manage. Against Azure DevOps Server the agent registers with a PAT or Windows authentication; service principal registration (agent 3.227.1+) exists only in Azure DevOps Services |
 | **B. No agent on the VM** | The pipeline runs on a regular agent and starts the test script via Run Command; the VM pulls packages from Azure Artifacts (e.g. with a managed identity added to the organization) and uploads results to a blob | Nothing extra on the VM | Results delivery has to be built |
-| **C. Managed DevOps Pools** | Azure DevOps creates a VM from a Compute Gallery image per job and deletes it | Could replace Terraform for the test VMs | Windows 11 support not confirmed in the docs (only server images are listed); different architecture |
+| **C. Managed DevOps Pools** | Azure DevOps creates a VM from a Compute Gallery image per job and deletes it | Could replace Terraform for the test VMs | **Azure DevOps Services only — not available for Azure DevOps Server.** Windows 11 support not confirmed in the docs; different architecture |
 
 Secrets (tokens, keys) must not travel in custom data, which is not encrypted. Use the Custom
 Script Extension's `protected_settings` (encrypted), a managed identity on the VM, or Key Vault.
