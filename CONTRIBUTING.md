@@ -1,45 +1,43 @@
 # Contributing
 
-This document describes how to work in this repository. It is a draft and will be expanded as the project grows.
+## Getting started
+
+1. Read this file
+2. Read [docs/conventions.md](docs/conventions.md) for the architecture and technical detail
+3. Check open issues before opening a new one
 
 ## Language
 
-All documentation, code comments, commit messages, and pull request descriptions are written in **English**.
+All documentation, code comments, commit messages, issues, and pull requests are written in
+**English**.
 
-## Workflow
+## Issue-first workflow
 
-1. Create a branch from `main` for each piece of work.
-2. Make focused changes; one logical change per pull request.
-3. Update the documentation in the same change when behavior, structure, or conventions change.
-4. Open a pull request and get it reviewed before merging.
+Every change starts with an issue. Check existing issues before creating a new one. Architectural
+decisions are discussed in issues and recorded in [docs/conventions.md](docs/conventions.md)
+rather than diverging in a PR.
 
-## Branches
+## Branching
 
-_TBD: branch naming scheme._
+Branch from `main` using the issue number:
 
-## Commits
+```
+feature/<N>-<short-description>
+fix/<N>-<short-description>
+docs/<N>-<short-description>
+```
 
-- Write the subject line in the imperative mood ("Add VM module", not "Added VM module").
-- Keep the subject line short; explain the *why* in the body when it is not obvious.
+## PR process
 
-## Pull requests
+1. Branch from `main`
+2. Implement the change
+3. Update docs when behavior or architecture changes
+4. Open a PR with a short summary and `Closes #N`
 
-- Describe what changed and why.
-- Link the related issue, if there is one.
-- Make sure checks pass before requesting review.
+## What not to do
 
-## Documentation
-
-The repository follows the committed engineering documentation pattern:
-
-| Document | Purpose |
-| --- | --- |
-| `README.md` | What the project is and how to get started |
-| `CONTRIBUTING.md` | How to work in the repository |
-| `docs/conventions.md` | Engineering conventions and rules |
-
-If a change makes any of these documents inaccurate, update them in the same pull request.
-
-## Secrets
-
-Never commit credentials, subscription keys, passwords, or other secrets. _TBD: how secrets are supplied to local runs and CI._
+- Don't push directly to `main` — always open a PR
+- Don't open a PR without a tracking issue
+- **Don't commit secrets.** Azure credentials, service principal secrets, VM admin passwords, and
+  any other sensitive values come from the environment (or a local `.env` that is gitignored). No
+  credentials in tracked files, examples, tests, or fixtures.

@@ -1,34 +1,41 @@
 # azure-windows-automation
 
-Proof of concept for automating the deployment of Windows-based virtual machines in Microsoft Azure.
+Proof of concept for **automated deployment of Windows-based virtual machines in Microsoft Azure**
+— from an empty subscription to a configured, reachable Windows VM, driven entirely from code in
+this repository.
 
-> **Status:** early draft. Scope, tooling, and layout will be filled in as the work progresses.
+> **Status: draft.** The repository is being bootstrapped. Scope, tooling, and layout are open
+> decisions and will be filled in as the work progresses (see open issues).
 
 ## Goals
 
-- Provision Windows VMs in Azure repeatably, from code.
-- Automate post-deployment configuration of the guest OS.
-- Keep the whole flow reproducible and documented in this repository.
+- **Repeatable provisioning** — Windows VMs and their supporting Azure resources (resource group,
+  network, storage, identity) are created from code, not by hand in the portal.
+- **Automated guest configuration** — post-deployment configuration of the Windows guest OS runs
+  as part of the same flow.
+- **Reproducible and documented** — everything needed to rerun a deployment lives in the
+  repository, except secrets.
+
+## Architecture at a glance
+
+_TBD — to be added once the tooling is chosen._
+
+Full technical reference: [docs/conventions.md](docs/conventions.md).
 
 ## Repository layout
 
 ```
-.
-├── README.md            # This file: what the project is and how to get started
-├── CONTRIBUTING.md      # How to work in this repository
-└── docs/
-    └── conventions.md   # Engineering conventions (naming, style, structure)
+docs/
+  conventions.md    technical reference: architecture, conventions, open decisions
+CONTRIBUTING.md     how to work in this repository
+README.md           this file
 ```
 
-## Getting started
+## Deploy & use
 
-_TBD: prerequisites, authentication to Azure, and the first deployment walkthrough._
+_TBD — prerequisites, Azure authentication, and a first-deployment walkthrough._
 
-## Documentation
+## Contributing
 
-This repository follows the **committed engineering documentation** pattern: the knowledge needed to work on the project lives in the repository, next to the code, and is updated in the same change that makes it necessary.
-
-- [`CONTRIBUTING.md`](CONTRIBUTING.md): workflow, branching, commits, and reviews.
-- [`docs/conventions.md`](docs/conventions.md): naming, code style, and structural rules.
-
-All documentation in this repository is written in English.
+See [CONTRIBUTING.md](CONTRIBUTING.md) — issue-first, a branch per issue, a PR that links it.
+Never commit secrets; all credentials come from the environment.
