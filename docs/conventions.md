@@ -20,11 +20,28 @@ _TBD — filled in as components are built._
 |-----------|-----------|----------------|
 | | | |
 
+## Guest configuration
+
+Windows VMs in Azure have no cloud-init: custom data and user data are delivered to the VM but
+never executed ([research](research/windows-provisioning.md)). Deploy-time configuration runs
+through the VM Agent instead:
+
+- **Custom Script Extension** (`azurerm_virtual_machine_extension`) — the payload travels as
+  custom data and the extension executes `C:\AzureData\CustomData.bin`.
+- **Managed Run Command** (`azurerm_virtual_machine_run_command`) — inline scripts, several per
+  VM, output in the resource's `instance_view`.
+
+Which one is the default is an open decision. Either way, scripts run as `LocalSystem`, must be
+idempotent, must not restart the VM, and use `Invoke-WebRequest -UseBasicParsing`.
+
 ## Naming
 
 ### Azure resources
 
 _TBD — naming scheme for resource groups, VMs, networks, and other resources._
+
+Experiments use the prefix `awa-poc-` (for example `rg-awa-poc-cfgtest`) and carry the tags
+`project = azure-windows-automation` and `ephemeral = true`.
 
 ### Files and directories
 
@@ -32,7 +49,10 @@ Lowercase with hyphens (`vm-config`, not `VmConfig`), unless the tooling require
 
 ## Auth & security
 
-- **Azure authentication** — _TBD_ (interactive login, service principal, or managed identity).
+- **Azure authentication** — local runs use the operator's `az login` session (the `azurerm`
+  provider picks it up). CI uses a service principal with a client secret, passed as `ARM_CLIENT_ID`,
+  `ARM_CLIENT_SECRET`, `ARM_TENANT_ID`, `ARM_SUBSCRIPTION_ID`. OIDC (federated credentials) is
+  deferred until the project moves to its target version control system.
 - **VM credentials** — admin passwords and other secrets come from the environment or a secret
   store; never from tracked files.
 
@@ -54,7 +74,8 @@ _TBD — Azure-side facts the design works around (quotas, SKU availability, ima
 
 ## Tech stack (proposal — confirm in an issue)
 
-_TBD._
+- **Infrastructure as code:** Terraform with the `azurerm` provider (used by the experiments).
+- **Guest scripts:** Windows PowerShell 5.1 (present on every image).
 
-Open decisions: infrastructure-as-code tool, guest configuration mechanism, Azure authentication
-method for local runs and CI, target Windows Server version(s) and VM size(s), region.
+Open decisions: guest configuration default (Custom Script Extension vs. Managed Run Command),
+target Windows Server version(s) and VM size(s), region.

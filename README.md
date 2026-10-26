@@ -27,9 +27,16 @@ Full technical reference: [docs/conventions.md](docs/conventions.md).
 ```
 docs/
   conventions.md    technical reference: architecture, conventions, open decisions
+  research/         findings from experiments and documentation reviews
+experiments/        self-contained Terraform experiments (one directory each)
 CONTRIBUTING.md     how to work in this repository
 README.md           this file
 ```
+
+## Research
+
+- [Deploy-time configuration of Windows VMs](docs/research/windows-provisioning.md) — cloud-init
+  does not exist for Windows in Azure; the Custom Script Extension and Managed Run Command work.
 
 ## Deploy & use
 
