@@ -91,6 +91,35 @@ The VM reported `securityType = TrustedLaunch`; inside, `Confirm-SecureBootUEFI`
 (`azkms.core.windows.net`, `VOLUME_KMSCLIENT` channel). Activation does not prove the licensing
 entitlement; see [windows-client.md](windows-client.md).
 
+## PoC subscription run from the VDI
+
+On 2026-10-29 the same configuration ran from the corporate VDI against the PoC subscription, as
+the PoC service principal, with Terraform state in the `azurerm` backend
+(`use_azuread_auth = true`) and all traffic through the corporate proxy
+([runbook](../runbooks/vdi-setup.md)).
+
+- **Image:** Windows 11 Pro 26H2 (`win11-26h2-pro`, latest), Trusted Launch,
+  `license_type = "Windows_Client"`
+- **Size:** `Standard_D2s_v7` with `disk_controller_type = "NVMe"`. `Standard_B2s` failed on
+  regional capacity and the Dsv5, Dasv5, and Bsv2 sizes are not available to the subscription in
+  `westeurope` ([constraints](../conventions.md#known-platform-constraints-azure)).
+
+| Test | Result |
+|------|--------|
+| A `custom_data` | `CustomData.bin` present, plain text, **not executed** |
+| B `user_data` | Available from IMDS, **not executed** |
+| C Custom Script Extension | **Succeeded**: 7-Zip 26.05 installed, as `NT AUTHORITY\SYSTEM` |
+| D Managed Run Command | **Succeeded**: PowerShell 7.6.9 installed, exit code 0 in `instance_view` |
+
+The service principal's rights were sufficient for the whole configuration (resource group,
+network, public IP, VM, extension, run command), and the remote state worked through Entra ID
+without storage account keys.
+
+Inside the VM: boot at 19:57:37, the Custom Script Extension payload ran 20:01:43–20:01:48, the run
+command 20:02:21–20:02:34 (UTC). The first `terraform apply` on the VDI paused for about two
+minutes before printing the plan, most likely while the freshly downloaded `azurerm` provider
+started for the first time.
+
 ## Open questions
 
 - Does `terraform apply` fail when the script fails (non-zero exit / thrown error)? Needed for CI.
