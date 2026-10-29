@@ -1,0 +1,8 @@
+# Copy to <environment>.azurerm.tfbackend in this directory (git-ignored) and fill in.
+resource_group_name  = "<state resource group>"
+storage_account_name = "<state storage account>"
+container_name       = "<state container>"
+key                  = "awa-poc/windows-provisioning.tfstate"
+subscription_id      = "<subscription id of the state storage account>"
+tenant_id            = "<tenant id>"
+use_azuread_auth     = true

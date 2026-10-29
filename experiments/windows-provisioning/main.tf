@@ -83,6 +83,7 @@ resource "azurerm_windows_virtual_machine" "this" {
   location              = azurerm_resource_group.this.location
   resource_group_name   = azurerm_resource_group.this.name
   size                  = var.vm_size
+  disk_controller_type  = var.disk_controller_type
   admin_username        = "azureadmin"
   admin_password        = random_password.admin.result
   network_interface_ids = [azurerm_network_interface.this.id]

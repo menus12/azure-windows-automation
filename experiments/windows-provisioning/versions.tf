@@ -1,6 +1,10 @@
 terraform {
   required_version = ">= 1.9"
 
+  # Partial configuration: storage account, container and state key come
+  # from a *.azurerm.tfbackend file. See docs/runbooks/vdi-setup.md.
+  backend "azurerm" {}
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"

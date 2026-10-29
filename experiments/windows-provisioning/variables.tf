@@ -1,6 +1,7 @@
 variable "subscription_id" {
-  description = "Azure subscription to deploy into."
+  description = "Azure subscription to deploy into. Defaults to ARM_SUBSCRIPTION_ID."
   type        = string
+  default     = null
 }
 
 variable "location" {
@@ -19,6 +20,12 @@ variable "vm_size" {
   description = "VM size."
   type        = string
   default     = "Standard_B2s"
+}
+
+variable "disk_controller_type" {
+  description = "OS disk controller: SCSI or NVMe. v6 and newer sizes (e.g. Dsv7) support NVMe only. Null keeps the Azure default (SCSI)."
+  type        = string
+  default     = null
 }
 
 variable "image" {
