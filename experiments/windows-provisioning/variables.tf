@@ -1,6 +1,7 @@
 variable "subscription_id" {
-  description = "Azure subscription to deploy into."
+  description = "Azure subscription to deploy into. Defaults to ARM_SUBSCRIPTION_ID."
   type        = string
+  default     = null
 }
 
 variable "location" {

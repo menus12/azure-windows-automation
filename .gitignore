@@ -9,3 +9,7 @@ terraform.tfvars
 
 # Local environment
 .env
+
+# Terraform backend files carry environment details; commit only examples
+*.tfbackend
+!example.azurerm.tfbackend

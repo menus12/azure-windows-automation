@@ -29,6 +29,7 @@ docs/
   conventions.md    technical reference: architecture, conventions, open decisions
   proposals/        proposals for decisions outside this repository
   research/         findings from experiments and documentation reviews
+  runbooks/         operational how-tos (workstation setup)
 experiments/        self-contained Terraform experiments (one directory each)
 CONTRIBUTING.md     how to work in this repository
 README.md           this file
@@ -57,7 +58,12 @@ README.md           this file
 
 ## Deploy & use
 
-_TBD — prerequisites, Azure authentication, and a first-deployment walkthrough._
+Experiments run from PowerShell on the operator VDI, as the PoC service principal, with Terraform
+state in Azure Storage:
+
+1. Set up the workstation: [docs/runbooks/vdi-setup.md](docs/runbooks/vdi-setup.md) (Azure CLI
+   without admin rights, proxy, service principal, backend file).
+2. Run an experiment: see the README in its directory under [experiments/](experiments/).
 
 ## Contributing
 

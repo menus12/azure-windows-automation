@@ -60,24 +60,42 @@ Lowercase with hyphens (`vm-config`, not `VmConfig`), unless the tooling require
 
 ## Auth & security
 
-- **Azure authentication** — local runs use the operator's `az login` session (the `azurerm`
-  provider picks it up). CI uses a service principal with a client secret, passed as `ARM_CLIENT_ID`,
-  `ARM_CLIENT_SECRET`, `ARM_TENANT_ID`, `ARM_SUBSCRIPTION_ID`. OIDC (federated credentials) is
+- **Azure authentication** — Terraform and Azure CLI run as a service principal, passed as
+  `ARM_CLIENT_ID`, `ARM_CLIENT_SECRET`, `ARM_TENANT_ID`, `ARM_SUBSCRIPTION_ID`. The same variables
+  are what an Azure DevOps Server pipeline will set later. OIDC (federated credentials) is
   deferred until the project moves to its target version control system.
+- **Client secret on the operator VDI** — encrypted with Windows DPAPI and loaded by the
+  PowerShell profile, not stored as a plain environment variable
+  ([runbook](runbooks/vdi-setup.md)).
 - **VM credentials** — admin passwords and other secrets come from the environment or a secret
   store; never from tracked files.
+- **Environment details stay local.** The repository is public: subscription, tenant, and client
+  IDs, storage account names, and proxy hosts live in local settings (`ARM_*`, `*.tfbackend`),
+  not in tracked files.
 
 ## Configuration
 
-All config is environment / a gitignored `.env` (never tracked):
+All environment-specific configuration is local and never tracked:
 
-| Setting | Purpose |
-|---------|---------|
-| | _TBD_ |
+| Setting | Where | Purpose |
+|---------|-------|---------|
+| `ARM_CLIENT_ID`, `ARM_TENANT_ID`, `ARM_SUBSCRIPTION_ID` | User environment variables | Service principal and target subscription |
+| `ARM_CLIENT_SECRET` | DPAPI file + PowerShell profile | Service principal secret |
+| `HTTPS_PROXY`, `HTTP_PROXY`, `NO_PROXY` | User environment variables | Corporate proxy for Azure CLI and Terraform |
+| `experiments/<environment>.azurerm.tfbackend` | Git-ignored file | Terraform state storage account and container |
 
 ## Deployment
 
-_TBD — how a deployment is run, locally and/or from CI._
+Experiments run from PowerShell on the operator VDI ([runbook](runbooks/vdi-setup.md)):
+
+- **Remote state** in an Azure Storage container through the `azurerm` backend with
+  `use_azuread_auth = true`. The backend block is a partial configuration; the storage details
+  come from the `*.tfbackend` file.
+- **One state key per experiment and variant**, passed on init:
+  `-backend-config="key=awa-poc/<experiment>/<variant>.tfstate"`. Variants (Windows Server,
+  Windows 11) never share a state.
+- **Outbound access through the corporate proxy only** — Azure CLI and Terraform need
+  `HTTPS_PROXY` set explicitly; they don't pick up the Windows proxy settings.
 
 ## Known platform constraints (Azure)
 
