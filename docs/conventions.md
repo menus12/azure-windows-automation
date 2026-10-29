@@ -98,7 +98,12 @@ Experiments run from PowerShell on the operator VDI ([runbook](runbooks/vdi-setu
 
 ## Known platform constraints (Azure)
 
-_TBD — Azure-side facts the design works around (quotas, SKU availability, image licensing, etc.)._
+- **VM sizes are restricted on the PoC subscription in `westeurope`.** `Standard_B2s` failed on
+  regional capacity, and the Dsv5, Dasv5, and Bsv2 sizes report `NotAvailableForSubscription`.
+  The v7 generation (for example `Standard_D2s_v7`) is available. Check before choosing a size:
+  `az vm list-skus -l <region> --size <size> --query "[].restrictions"`.
+- **Dsv6/Dsv7 and newer sizes support only an NVMe disk controller.** Set
+  `disk_controller_type = "NVMe"`; the Windows 11 Marketplace images support it.
 
 ## Tech stack (proposal — confirm in an issue)
 
