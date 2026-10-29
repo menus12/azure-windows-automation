@@ -42,7 +42,8 @@ Terraform state and has to be deleted (or the VM recreated) before a retry.
 
 ## Windows 11
 
-Test VMs run Windows 11 Enterprise from the Marketplace ([research](research/windows-client.md)):
+Test VMs run Windows 11 Pro 26H2 from the Marketplace (`win11-26h2-pro`, the version fixed for
+the experiments; [research](research/windows-client.md)):
 `license_type = "Windows_Client"` and Trusted Launch (`secure_boot_enabled`, `vtpm_enabled`).
 
 ## Naming
@@ -82,18 +83,16 @@ All environment-specific configuration is local and never tracked:
 | `ARM_CLIENT_ID`, `ARM_TENANT_ID`, `ARM_SUBSCRIPTION_ID` | User environment variables | Service principal and target subscription |
 | `ARM_CLIENT_SECRET` | DPAPI file + PowerShell profile | Service principal secret |
 | `HTTPS_PROXY`, `HTTP_PROXY`, `NO_PROXY` | User environment variables | Corporate proxy for Azure CLI and Terraform |
-| `experiments/<environment>.azurerm.tfbackend` | Git-ignored file | Terraform state storage account and container |
+| `<environment>.azurerm.tfbackend` in the experiment directory | Git-ignored file | Terraform state storage account, container, and key |
 
 ## Deployment
 
 Experiments run from PowerShell on the operator VDI ([runbook](runbooks/vdi-setup.md)):
 
 - **Remote state** in an Azure Storage container through the `azurerm` backend with
-  `use_azuread_auth = true`. The backend block is a partial configuration; the storage details
-  come from the `*.tfbackend` file.
-- **One state key per experiment and variant**, passed on init:
-  `-backend-config="key=awa-poc/<experiment>/<variant>.tfstate"`. Variants (Windows Server,
-  Windows 11) never share a state.
+  `use_azuread_auth = true`. The backend block is a partial configuration; the storage details and
+  the state key come from the `*.tfbackend` file. Only `windows-provisioning` is set up for remote
+  state; the next stage moves to Azure DevOps Server pipelines.
 - **Outbound access through the corporate proxy only** — Azure CLI and Terraform need
   `HTTPS_PROXY` set explicitly; they don't pick up the Windows proxy settings.
 

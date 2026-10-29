@@ -1,9 +1,9 @@
-# Windows 11 Enterprise from the Marketplace. Requires an eligible license
-# (Microsoft 365 E3/E5, Windows Enterprise E3/E5, or VDA) for the users.
+# Windows 11 Pro 26H2 from the Marketplace, the version fixed for the experiments.
+# Requires an eligible Windows 11 license for the users (Multitenant Hosting Rights).
 image = {
   publisher = "MicrosoftWindowsDesktop"
   offer     = "windows-11"
-  sku       = "win11-25h2-ent"
+  sku       = "win11-26h2-pro"
 }
 license_type   = "Windows_Client"
 trusted_launch = true

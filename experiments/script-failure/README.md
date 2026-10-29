@@ -19,33 +19,18 @@ process, so the payload keeps PowerShell's default error handling, and returns i
 
 ## Run
 
-From PowerShell, with the service principal variables (`ARM_*`) and the proxy set up as described
-in [docs/runbooks/vdi-setup.md](../../docs/runbooks/vdi-setup.md). The backend file
-`../<environment>.azurerm.tfbackend` is created from
-[example.azurerm.tfbackend](../example.azurerm.tfbackend).
+```bash
+terraform init
+terraform apply -var subscription_id=<SUBSCRIPTION_ID>                       # Windows Server 2022
+terraform apply -var subscription_id=<SUBSCRIPTION_ID> -var-file win11.tfvars # Windows 11
 
-```powershell
-# Windows Server 2022
-terraform init -reconfigure -backend-config="../<environment>.azurerm.tfbackend" `
-  -backend-config="key=awa-poc/script-failure/server.tfstate"
-terraform apply
-
-# Windows 11 (separate state)
-terraform init -reconfigure -backend-config="../<environment>.azurerm.tfbackend" `
-  -backend-config="key=awa-poc/script-failure/win11.tfstate"
-terraform apply -var-file win11.tfvars
-```
-
-`apply` is expected to fail (exit code 1) on the `*-throw` cases. Check the VMs, then destroy with
-the same variables as `apply`:
-
-```powershell
-$rg = "rg-awa-poc-scriptfail"        # Windows 11: rg-awa-poc-scriptfail-w11
-foreach ($vm in "cse-throw", "cse-soft", "rc-throw", "rc-soft") {
-  az vm run-command invoke -g $rg -n "vm-$vm" `
-    --command-id RunPowerShellScript --scripts "@scripts/verify.ps1" `
+for vm in cse-throw cse-soft rc-throw rc-soft; do
+  az vm run-command invoke -g rg-<name_prefix> -n vm-$vm \
+    --command-id RunPowerShellScript --scripts @scripts/verify.ps1 \
     --query "value[0].message" -o tsv
-}
+done
 
-terraform destroy                    # Windows 11: terraform destroy -var-file win11.tfvars
+terraform destroy -var subscription_id=<SUBSCRIPTION_ID> [-var-file win11.tfvars]
 ```
+
+`apply` is expected to fail (exit code 1) on the `*-throw` cases.

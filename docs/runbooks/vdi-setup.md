@@ -9,7 +9,7 @@ subscription. Nothing here needs administrator rights.
 |------|-----------------|
 | Subscription, tenant, service principal client ID | User environment variables `ARM_*` (step 3) |
 | Service principal secret | DPAPI-encrypted file loaded by the PowerShell profile (step 3) |
-| Terraform state (resource group, storage account, container) | `experiments/<environment>.azurerm.tfbackend`, git-ignored (step 5) |
+| Terraform state (resource group, storage account, container, key) | `experiments/windows-provisioning/<environment>.azurerm.tfbackend`, git-ignored (step 5) |
 | Corporate proxy | User environment variables `HTTPS_PROXY`, `HTTP_PROXY` (step 2) |
 
 The PoC subscription is in `westeurope`. The service principal has Owner on the subscription and
@@ -118,14 +118,12 @@ that shell.
 
 ## 5. Terraform backend
 
-Create `experiments/<environment>.azurerm.tfbackend` from
-[example.azurerm.tfbackend](../../experiments/example.azurerm.tfbackend) (`*.tfbackend` files are
-git-ignored). Leave the `key` out of the file and pass it on `init`, so every experiment and
-variant has its own state:
+Create `<environment>.azurerm.tfbackend` in the experiment directory from
+[example.azurerm.tfbackend](../../experiments/windows-provisioning/example.azurerm.tfbackend)
+(`*.tfbackend` files are git-ignored), then:
 
 ```powershell
-terraform init -reconfigure -backend-config="../<environment>.azurerm.tfbackend" `
-  -backend-config="key=awa-poc/<experiment>/<variant>.tfstate"
+terraform init -reconfigure -backend-config="<environment>.azurerm.tfbackend"
 ```
 
 `use_azuread_auth = true` makes the backend use the service principal's Storage Blob Data Owner
